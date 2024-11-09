@@ -205,6 +205,23 @@ def tts():
         synthesizer.save_wav(wavs, out)
     return send_file(out, mimetype="audio/wav")
 
+@app.route("/api/tts-clone", methods=["GET", "POST"])
+def tts_clone():
+    with lock:
+        text = request.headers.get("text") or request.values.get("text", "")
+        language_idx = request.headers.get("language") or request.values.get("language", "en")
+        speaker_wav = request.headers.get("speaker-wav") or request.values.get("speaker_wav", "")
+        speaker_idx = request.headers.get("speaker-id") or request.values.get("speaker_id", "")
+
+        print(f" > Model input: {text}")
+        print(f" > Speaker Idx: {speaker_idx}")
+        print(f" > speaker_wav: {speaker_wav}")
+        print(f" > Language Idx: {language_idx}")
+        wavs = synthesizer.tts(text, language_name=language_idx, speaker_wav=speaker_wav, speaker_name=speaker_idx)
+        out = io.BytesIO()
+        synthesizer.save_wav(wavs, out)
+    return send_file(out, mimetype="audio/wav")
+
 
 # Basic MaryTTS compatibility layer
 
